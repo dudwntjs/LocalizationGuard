@@ -1,5 +1,12 @@
 # LocalizationGuard
 
+[![Swift 6.1+](https://img.shields.io/badge/Swift-6.1%2B-F05138?logo=swift&logoColor=white)](https://www.swift.org)
+[![macOS 13+](https://img.shields.io/badge/macOS-13%2B-000000?logo=apple&logoColor=white)](https://developer.apple.com/macos/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/tag/dudwntjs/LocalizationGuard?label=release&sort=semver)](https://github.com/dudwntjs/LocalizationGuard/tags)
+
+**English** | [한국어](README_KO.md)
+
 A Swift build tool plug-in that finds localization gaps and reports them as clickable Xcode warnings.
 
 LocalizationGuard compares user-facing strings in Swift source files with the keys in your String Catalogs. It consists of a small command-line scanner and a build tool plug-in that runs the scanner during builds.
