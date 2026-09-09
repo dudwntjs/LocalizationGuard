@@ -4,15 +4,13 @@ import Foundation
 
 struct Settings: Decodable {
     var catalogs: [String] = []
-
-    var excludedPaths: [String] = [
+    var excludedPaths = [
         "Tests",
         "Generated",
         "PreviewContent",
         ".build"
     ]
-
-    var ignoredFunctions: [String] = [
+    var ignoredFunctions = [
         "print",
         "debugPrint",
         "assertionFailure",
@@ -30,16 +28,11 @@ struct Settings: Decodable {
 
 // MARK: - Command-Line Arguments
 
-let arguments = Array(
-    CommandLine.arguments.dropFirst()
-)
-
-let root = URL(
-    fileURLWithPath:
-        arguments.first
-        ?? FileManager.default.currentDirectoryPath
-)
-.standardizedFileURL
+let arguments = Array(CommandLine.arguments.dropFirst())
+let defaultPath = FileManager.default.currentDirectoryPath
+let rootPath = arguments.first ?? defaultPath
+let root = URL(fileURLWithPath: rootPath)
+    .standardizedFileURL
 
 let stampPath: String? =
     arguments.indices.contains(2)
@@ -52,16 +45,13 @@ let stampPath: String? =
 let configURL = root.appendingPathComponent(
     ".localizationguard.json"
 )
-
-let settings =
-    (try? Data(contentsOf: configURL))
+let settings = (try? Data(contentsOf: configURL))
     .flatMap { data in
         try? JSONDecoder().decode(
             Settings.self,
             from: data
         )
-    }
-    ?? Settings()
+    } ?? Settings()
 
 // MARK: - File Discovery
 
@@ -87,11 +77,9 @@ func projectFiles(
             of: root.path + "/",
             with: ""
         )
-
         let pathComponents = relativePath.split(
             separator: "/"
         )
-
         let isExcluded = settings.excludedPaths.contains {
             pathComponents.contains(Substring($0))
         }
@@ -105,9 +93,7 @@ func projectFiles(
 let catalogURLs: [URL]
 
 if settings.catalogs.isEmpty {
-    catalogURLs = projectFiles(
-        extension: "xcstrings"
-    )
+    catalogURLs = projectFiles(extension: "xcstrings")
 } else {
     catalogURLs = settings.catalogs.map {
         root.appendingPathComponent($0)
@@ -119,9 +105,7 @@ var warnings: [String] = []
 
 for catalogURL in catalogURLs {
     guard
-        let data = try? Data(
-            contentsOf: catalogURL
-        ),
+        let data = try? Data(contentsOf: catalogURL),
         let json = try? JSONSerialization.jsonObject(
             with: data
         ) as? [String: Any]
@@ -129,10 +113,8 @@ for catalogURL in catalogURLs {
         continue
     }
 
-    let strings =
-        json["strings"] as? [String: Any]
+    let strings = json["strings"] as? [String: Any]
         ?? [:]
-
     keys.formUnion(strings.keys)
 }
 
@@ -143,15 +125,11 @@ let literalPatterns = [
     #"(?:\.text\s*=|setTitle\s*\()\s*\"((?:\\.|[^\"\\])*)\""#,
     #"(?:Text|Button|Label|navigationTitle|accessibilityLabel)\s*\(\s*\"((?:\\.|[^\"\\])*)\""#
 ]
-
 let localizedKeyPattern =
     #"(?:String\s*\(\s*localized\s*:|LocalizedStringResource\s*\()\s*\"((?:\\.|[^\"\\])*)\""#
-
 let anyStringLiteralPattern =
     #"\"((?:\\.|[^\"\\])*)\""#
-
-let koreanPattern =
-    #"[\u{AC00}-\u{D7A3}]"#
+let koreanPattern = #"[\u{AC00}-\u{D7A3}]"#
 
 // MARK: - Pattern Matching
 
@@ -165,70 +143,52 @@ func matches(
         return []
     }
 
-    let lineRange = NSRange(
-        line.startIndex...,
-        in: line
-    )
+    let lineRange = NSRange(line.startIndex..., in: line)
+    return regex.matches(in: line, range: lineRange)
+        .compactMap { match in
+            guard
+                match.numberOfRanges > 1,
+                let range = Range(
+                    match.range(at: 1),
+                    in: line
+                )
+            else {
+                return nil
+            }
 
-    return regex.matches(
-        in: line,
-        range: lineRange
-    )
-    .compactMap { match in
-        guard
-            match.numberOfRanges > 1,
-            let range = Range(
-                match.range(at: 1),
-                in: line
+            return (
+                value: String(line[range]),
+                column: match.range.location + 1
             )
-        else {
-            return nil
         }
-
-        return (
-            value: String(line[range]),
-            column: match.range.location + 1
-        )
-    }
 }
 
-func decoded(
-    _ value: String
-) -> String {
+func decoded(_ value: String) -> String {
     let escapedValue = value.replacingOccurrences(
         of: "\"",
         with: "\\\""
     )
-
     let json = "\"\(escapedValue)\""
 
-    return (
-        try? JSONDecoder().decode(
-            String.self,
-            from: Data(json.utf8)
-        )
-    )
-    ?? value
+    return (try? JSONDecoder().decode(
+        String.self,
+        from: Data(json.utf8)
+    )) ?? value
 }
 
-func containsKorean(
-    _ value: String
-) -> Bool {
+func containsKorean(_ value: String) -> Bool {
     value.range(
         of: koreanPattern,
         options: .regularExpression
     ) != nil
 }
 
-func isIgnoredDiagnosticLine(
-    _ line: String
-) -> Bool {
+func isIgnoredDiagnosticLine(_ line: String) -> Bool {
     settings.ignoredFunctions.contains { function in
         let escapedFunction =
             NSRegularExpression.escapedPattern(
                 for: function
             )
-
         let pattern =
             #"\b"# + escapedFunction + #"\s*\("#
 
@@ -237,6 +197,61 @@ func isIgnoredDiagnosticLine(
             options: .regularExpression
         ) != nil
     }
+}
+
+// MARK: - Diagnostics
+
+func location(
+    file: URL,
+    line: Int,
+    column: Int
+) -> String {
+    "\(file.path):\(line):\(column): warning:"
+}
+
+func missingKeyWarning(
+    value: String,
+    file: URL,
+    line: Int,
+    column: Int
+) -> String {
+    let location = location(
+        file: file,
+        line: line,
+        column: column
+    )
+    return "\(location) [LG01] \"\(value)\"가 "
+        + "String Catalog에 없습니다."
+}
+
+func interpolationWarning(
+    file: URL,
+    line: Int,
+    column: Int
+) -> String {
+    let location = location(
+        file: file,
+        line: line,
+        column: column
+    )
+    return "\(location) [LG02] 문자열 보간은 "
+        + "String(localized:) 또는 "
+        + "LocalizedStringResource로 확인하세요."
+}
+
+func unknownKeyWarning(
+    key: String,
+    file: URL,
+    line: Int,
+    column: Int
+) -> String {
+    let location = location(
+        file: file,
+        line: line,
+        column: column
+    )
+    return "\(location) [LG03] 존재하지 않는 "
+        + "로컬라이제이션 키 \"\(key)\"입니다."
 }
 
 // MARK: - Source Scanning
@@ -249,10 +264,7 @@ for file in projectFiles(extension: "swift") {
         continue
     }
 
-    let lines = source.components(
-        separatedBy: .newlines
-    )
-
+    let lines = source.components(separatedBy: .newlines)
     var previewBraceDepth = 0
     var isInsidePreview = false
     var ignoredCallParenthesisDepth = 0
@@ -266,15 +278,12 @@ for file in projectFiles(extension: "swift") {
             previewBraceDepth += line.filter {
                 $0 == "{"
             }.count
-
             previewBraceDepth -= line.filter {
                 $0 == "}"
             }.count
 
-            if
-                previewBraceDepth <= 0,
-                line.contains("}")
-            {
+            if previewBraceDepth <= 0,
+               line.contains("}") {
                 isInsidePreview = false
                 previewBraceDepth = 0
             }
@@ -286,11 +295,9 @@ for file in projectFiles(extension: "swift") {
             ignoredCallParenthesisDepth += line.filter {
                 $0 == "("
             }.count
-
             ignoredCallParenthesisDepth -= line.filter {
                 $0 == ")"
             }.count
-
             continue
         }
 
@@ -300,12 +307,10 @@ for file in projectFiles(extension: "swift") {
             continue
         }
 
-        if
-            index > 0,
-            lines[index - 1].contains(
-                "localization-guard:disable-next-line"
-            )
-        {
+        if index > 0,
+           lines[index - 1].contains(
+               "localization-guard:disable-next-line"
+           ) {
             continue
         }
 
@@ -313,7 +318,6 @@ for file in projectFiles(extension: "swift") {
             let openingCount = line.filter {
                 $0 == "("
             }.count
-
             let closingCount = line.filter {
                 $0 == ")"
             }.count
@@ -322,48 +326,46 @@ for file in projectFiles(extension: "swift") {
                 openingCount - closingCount,
                 0
             )
-
             continue
         }
 
         for pattern in literalPatterns {
-            for match in matches(
-                pattern,
-                in: line
-            ) {
+            for match in matches(pattern, in: line) {
                 let value = decoded(match.value)
 
                 if match.value.contains(#"\("#) {
                     warnings.append(
-                        "\(file.path):\(index + 1):\(match.column): "
-                            + "warning: [LG02] 문자열 보간은 "
-                            + "String(localized:) 또는 "
-                            + "LocalizedStringResource로 확인하세요."
+                        interpolationWarning(
+                            file: file,
+                            line: index + 1,
+                            column: match.column
+                        )
                     )
-                } else if
-                    !value.isEmpty,
-                    !keys.contains(value)
-                {
+                } else if !value.isEmpty,
+                          !keys.contains(value) {
                     warnings.append(
-                        "\(file.path):\(index + 1):\(match.column): "
-                            + "warning: [LG01] \"\(value)\"가 "
-                            + "String Catalog에 없습니다."
+                        missingKeyWarning(
+                            value: value,
+                            file: file,
+                            line: index + 1,
+                            column: match.column
+                        )
                     )
                 }
             }
         }
 
-        for match in matches(
-            localizedKeyPattern,
-            in: line
-        ) {
+        for match in matches(localizedKeyPattern, in: line) {
             let key = decoded(match.value)
 
             if !keys.contains(key) {
                 warnings.append(
-                    "\(file.path):\(index + 1):\(match.column): "
-                        + "warning: [LG03] 존재하지 않는 "
-                        + "로컬라이제이션 키 \"\(key)\"입니다."
+                    unknownKeyWarning(
+                        key: key,
+                        file: file,
+                        line: index + 1,
+                        column: match.column
+                    )
                 )
             }
         }
@@ -380,54 +382,48 @@ for file in projectFiles(extension: "swift") {
 
             if match.value.contains(#"\("#) {
                 warnings.append(
-                    "\(file.path):\(index + 1):\(match.column): "
-                        + "warning: [LG02] 문자열 보간은 "
-                        + "String(localized:) 또는 "
-                        + "LocalizedStringResource로 확인하세요."
+                    interpolationWarning(
+                        file: file,
+                        line: index + 1,
+                        column: match.column
+                    )
                 )
             } else if !keys.contains(value) {
                 warnings.append(
-                    "\(file.path):\(index + 1):\(match.column): "
-                        + "warning: [LG01] \"\(value)\"가 "
-                        + "String Catalog에 없습니다."
+                    missingKeyWarning(
+                        value: value,
+                        file: file,
+                        line: index + 1,
+                        column: match.column
+                    )
                 )
             }
         }
     }
 }
 
-// MARK: - Diagnostics
+// MARK: - Results
 
 let uniqueWarnings = Set(warnings).sorted()
 
 for warning in uniqueWarnings {
-    fputs(
-        warning + "\n",
-        stderr
-    )
+    fputs(warning + "\n", stderr)
 }
 
 let count = uniqueWarnings.count
-
-let summary =
-    count == 0
+let summary = count == 0
     ? "누락 없음"
     : "\(count)개 확인 필요"
 
 fputs(
-    "\(root.path):1:1: "
-        + "warning: [LG00] "
-        + "LocalizationGuard 실행 완료 — "
-        + "\(summary)\n",
+    "\(root.path):1:1: warning: [LG00] "
+        + "LocalizationGuard 실행 완료 — \(summary)\n",
     stderr
 )
 
 // MARK: - Build Completion
 
 if let stampPath {
-    try? Data().write(
-        to: URL(
-            fileURLWithPath: stampPath
-        )
-    )
+    let stampURL = URL(fileURLWithPath: stampPath)
+    try? Data().write(to: stampURL)
 }
