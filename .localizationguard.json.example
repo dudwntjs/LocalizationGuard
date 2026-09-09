@@ -1,0 +1,5 @@
+{
+  "catalogs": ["Sources/Resources/Localizable.xcstrings"],
+  "excludedPaths": ["Tests", "Generated", "PreviewContent", ".build"],
+  "ignoredFunctions": ["print", "debugPrint", "assertionFailure", "preconditionFailure", "fatalError", "os_log"]
+}
