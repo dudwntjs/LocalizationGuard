@@ -60,6 +60,14 @@ swift run LocalizationGuardCLI /path/to/your/project
 
 When attached to an Xcode target, the plug-in runs automatically when its inputs change. It prints an `LG00` completion summary so you can verify that the scan ran.
 
+## Current limitations
+
+LocalizationGuard currently focuses on projects that use Korean source strings.
+
+General string detection targets strings containing Korean characters. Explicitly supported SwiftUI APIs may be checked regardless of language.
+
+The current version checks whether a key exists in a String Catalog, but does not verify that every locale has a translated value.
+
 ## License
 
 LocalizationGuard is available under the MIT License.

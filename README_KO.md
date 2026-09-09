@@ -60,6 +60,14 @@ swift run LocalizationGuardCLI /path/to/your/project
 
 Xcode Target에 플러그인을 연결하면 입력 파일이 변경된 후 빌드할 때 검사가 자동으로 실행됩니다. 검사가 실행되었는지는 `LG00` 요약 경고로 확인할 수 있습니다.
 
+## 현재 제한 사항
+
+LocalizationGuard는 현재 한국어 원문을 사용하는 프로젝트를 중심으로 검사합니다.
+
+일반 문자열 탐지는 한글이 포함된 문자열을 대상으로 하며, 명시적으로 지원하는 SwiftUI API는 언어와 관계없이 검사될 수 있습니다.
+
+현재 버전은 String Catalog에 키가 존재하는지 확인하지만, 각 언어의 번역 값이 비어 있는지까지 검사하지는 않습니다.
+
 ## 라이선스
 
 LocalizationGuard는 MIT License로 배포됩니다. 자유롭게 사용·수정·배포할 수 있지만 저작권과 라이선스 문구를 유지해야 하며, 제작자는 사용 결과를 보증하지 않습니다.
