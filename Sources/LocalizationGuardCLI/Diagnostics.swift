@@ -13,7 +13,7 @@ enum DiagnosticReporter {
             column: column
         )
 
-        return "\(location) String '\(value)' is missing from the String Catalog."
+        return "\(location) Missing translation: String '\(value)' is missing from the String Catalog."
     }
 
     static func interpolation(
@@ -27,7 +27,7 @@ enum DiagnosticReporter {
             column: column
         )
 
-        return "\(location) Verify string interpolation uses "
+        return "\(location) String interpolation: Verify string interpolation uses "
             + "String(localized:) or LocalizedStringResource."
     }
 
@@ -43,7 +43,7 @@ enum DiagnosticReporter {
             column: column
         )
 
-        return "\(location) Localization key '\(key)' was not found in the String Catalog."
+        return "\(location) Unknown localization key: Key '\(key)' was not found in the String Catalog."
     }
 
     static func report(
@@ -62,7 +62,7 @@ enum DiagnosticReporter {
             : "Found \(count) localization \(count == 1 ? "issue" : "issues") to review."
 
         fputs(
-            "\(root.path):1:1: note: LocalizationGuard: "
+            "\(root.path):1:1: note: Localization summary: "
                 + "\(summary)\n",
             stderr
         )

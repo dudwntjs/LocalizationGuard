@@ -28,10 +28,10 @@ https://github.com/dudwntjs/LocalizationGuard
 
 ## 경고 종류
 
-- `String … is missing from the String Catalog.`: 사용자 노출 가능성이 있는 문구가 String Catalog에 없음
-- `Verify string interpolation uses …`: 문자열 보간에 로컬라이제이션 확인이 필요함
-- `Localization key … was not found in the String Catalog.`: 코드에서 사용한 로컬라이제이션 키가 존재하지 않음
-- `LocalizationGuard: …` (note): 검사 완료 결과 요약
+- `Missing translation`: 사용자 노출 가능성이 있는 문구가 String Catalog에 없음
+- `String interpolation`: 문자열 보간에 로컬라이제이션 확인이 필요함
+- `Unknown localization key`: 코드에서 사용한 로컬라이제이션 키가 존재하지 않음
+- `Localization summary` (note): 검사 완료 결과 요약
 
 의도적으로 검사에서 제외할 문구는 다음처럼 표시합니다.
 
@@ -58,7 +58,7 @@ Text(verbatim: "HTTP")
 swift run LocalizationGuardCLI /path/to/your/project
 ```
 
-Xcode Target에 플러그인을 연결하면 입력 파일이 변경된 후 빌드할 때 검사가 자동으로 실행됩니다. 검사가 실행되었는지는 `LocalizationGuard: …` 요약 메시지로 확인할 수 있습니다.
+Xcode Target에 플러그인을 연결하면 입력 파일이 변경된 후 빌드할 때 검사가 자동으로 실행됩니다. 검사가 실행되었는지는 `Localization summary` 요약 메시지로 확인할 수 있습니다.
 
 ## 현재 제한 사항
 
