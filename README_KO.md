@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/tag/dudwntjs/LocalizationGuard?label=release&sort=semver)](https://github.com/dudwntjs/LocalizationGuard/tags)
 
-[English](README.md) | **한국어**
+[English](README.md) | **한국어** | [日本語](README_JA.md)
 
 Swift 코드에서 로컬라이제이션 누락을 찾아 클릭 가능한 Xcode 경고로 표시하는 Swift 빌드 도구 플러그인입니다.
 

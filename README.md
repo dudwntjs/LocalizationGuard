@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/tag/dudwntjs/LocalizationGuard?label=release&sort=semver)](https://github.com/dudwntjs/LocalizationGuard/tags)
 
-**English** | [한국어](README_KO.md)
+**English** | [한국어](README_KO.md) | [日本語](README_JA.md)
 
 A Swift build tool plug-in that finds localization gaps and reports them as clickable Xcode warnings.
 
