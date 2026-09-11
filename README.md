@@ -28,10 +28,10 @@ Add `LocalizationGuardPlugin` to your app target, then confirm that it appears u
 
 ## Rules
 
-- `LG01`: UI-facing literal missing from a String Catalog
-- `LG02`: Interpolated string requiring localization review
-- `LG03`: Unknown explicit localization key
-- `LG00`: Scan completion summary
+- `String … is missing from the String Catalog.`: UI-facing literal missing from a String Catalog
+- `Verify string interpolation uses …`: Interpolated string requiring localization review
+- `Localization key … was not found in the String Catalog.`: Unknown explicit localization key
+- `LocalizationGuard: …` (note): Scan completion summary
 
 Suppress an intentional finding with:
 
@@ -58,7 +58,7 @@ Add `.localizationguard.json` to the root of the project being scanned. If `cata
 swift run LocalizationGuardCLI /path/to/your/project
 ```
 
-When attached to an Xcode target, the plug-in runs automatically when its inputs change. It prints an `LG00` completion summary so you can verify that the scan ran.
+When attached to an Xcode target, the plug-in runs automatically when its inputs change. It prints an `LocalizationGuard: …` completion summary so you can verify that the scan ran.
 
 ## Current limitations
 

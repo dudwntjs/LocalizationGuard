@@ -13,8 +13,7 @@ enum DiagnosticReporter {
             column: column
         )
 
-        return "\(location) [LG01] \"\(value)\"가 "
-            + "String Catalog에 없습니다."
+        return "\(location) String '\(value)' is missing from the String Catalog."
     }
 
     static func interpolation(
@@ -28,9 +27,8 @@ enum DiagnosticReporter {
             column: column
         )
 
-        return "\(location) [LG02] 문자열 보간은 "
-            + "String(localized:) 또는 "
-            + "LocalizedStringResource로 확인하세요."
+        return "\(location) Verify string interpolation uses "
+            + "String(localized:) or LocalizedStringResource."
     }
 
     static func unknownKey(
@@ -45,8 +43,7 @@ enum DiagnosticReporter {
             column: column
         )
 
-        return "\(location) [LG03] 존재하지 않는 "
-            + "로컬라이제이션 키 \"\(key)\"입니다."
+        return "\(location) Localization key '\(key)' was not found in the String Catalog."
     }
 
     static func report(
@@ -61,12 +58,11 @@ enum DiagnosticReporter {
 
         let count = uniqueWarnings.count
         let summary = count == 0
-            ? "누락 없음"
-            : "\(count)개 확인 필요"
+            ? "No localization issues found."
+            : "Found \(count) localization \(count == 1 ? "issue" : "issues") to review."
 
         fputs(
-            "\(root.path):1:1: warning: [LG00] "
-                + "LocalizationGuard 실행 완료 — "
+            "\(root.path):1:1: note: LocalizationGuard: "
                 + "\(summary)\n",
             stderr
         )
