@@ -31,6 +31,7 @@ Add `LocalizationGuardPlugin` to your app target, then confirm that it appears u
 - `Missing translation`: UI-facing literal missing from a String Catalog
 - `String interpolation`: Interpolated string requiring localization review
 - `Unknown localization key`: Unknown explicit localization key
+- `Missing language`: Missing or empty translation for a target language in a String Catalog
 - `Localization summary` (note): Scan completion summary
 
 Suppress an intentional finding with:
@@ -47,10 +48,13 @@ Add `.localizationguard.json` to the root of the project being scanned. If `cata
 ```json
 {
   "catalogs": ["Sources/Resources/Localizable.xcstrings"],
+  "requiredLanguages": ["ko", "en", "ja"],
   "excludedPaths": ["Tests", "Generated", "PreviewContent", ".build"],
   "ignoredFunctions": ["print", "debugPrint", "fatalError", "os_log"]
 }
 ```
+
+By default, target languages are inferred independently from the locales present in each catalog. Set `requiredLanguages` to check an explicit set, including a language with no translations yet. Missing entries and empty or whitespace-only values emit `Missing language` warnings linked to the catalog. The source language uses the key as a fallback; entries marked `shouldTranslate: false` or `stale` are skipped. Existing plural/device variants and substitutions are checked for empty values.
 
 ## Command-line usage
 
@@ -66,7 +70,7 @@ LocalizationGuard currently focuses on projects that use Korean source strings.
 
 General string detection targets strings containing Korean characters. Explicitly supported SwiftUI APIs may be checked regardless of language.
 
-The current version checks whether a key exists in a String Catalog, but does not verify that every locale has a translated value.
+The scanner checks key presence and missing/empty per-language values. It does not judge translation quality, review status, or whether all language-specific plural categories are present. Inferred languages cannot detect a locale absent from the entire catalog; use `requiredLanguages` for that case.
 
 ## License
 

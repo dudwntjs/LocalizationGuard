@@ -31,6 +31,7 @@ https://github.com/dudwntjs/LocalizationGuard
 - `Missing translation`: 사용자 노출 가능성이 있는 문구가 String Catalog에 없음
 - `String interpolation`: 문자열 보간에 로컬라이제이션 확인이 필요함
 - `Unknown localization key`: 코드에서 사용한 로컬라이제이션 키가 존재하지 않음
+- `Missing language`: 카탈로그 키는 있지만 특정 언어의 번역이 없거나 비어 있음
 - `Localization summary` (note): 검사 완료 결과 요약
 
 의도적으로 검사에서 제외할 문구는 다음처럼 표시합니다.
@@ -47,10 +48,13 @@ Text(verbatim: "HTTP")
 ```json
 {
   "catalogs": ["Sources/Resources/Localizable.xcstrings"],
+  "requiredLanguages": ["ko", "en", "ja"],
   "excludedPaths": ["Tests", "Generated", "PreviewContent", ".build"],
   "ignoredFunctions": ["print", "debugPrint", "fatalError", "os_log"]
 }
 ```
+
+기본적으로 각 카탈로그에 존재하는 언어를 검사 대상으로 추론합니다. `requiredLanguages`로 언어를 지정하면 아직 번역이 하나도 없는 언어도 검사합니다. 번역 항목이 없거나 값이 빈 문자열/공백이면 카탈로그로 연결되는 `Missing language` 경고를 출력합니다. 원문 언어는 키 자체를 기본값으로 사용하므로 별도 번역을 요구하지 않습니다. `shouldTranslate: false` 또는 `stale` 항목은 제외하며, 등록된 복수형·기기별 변형과 치환 문자열의 빈 값도 검사합니다.
 
 ## 명령줄에서 실행
 
@@ -66,7 +70,7 @@ LocalizationGuard는 현재 한국어 원문을 사용하는 프로젝트를 중
 
 일반 문자열 탐지는 한글이 포함된 문자열을 대상으로 하며, 명시적으로 지원하는 SwiftUI API는 언어와 관계없이 검사될 수 있습니다.
 
-현재 버전은 String Catalog에 키가 존재하는지 확인하지만, 각 언어의 번역 값이 비어 있는지까지 검사하지는 않습니다.
+키 존재 여부와 언어별 번역 누락·빈 값을 검사합니다. 번역의 품질, 검토 상태, 언어별 모든 복수형 범주의 존재 여부까지 판단하지는 않습니다. 카탈로그 전체에 없는 언어는 자동 추론할 수 없으므로 `requiredLanguages`로 지정해야 합니다.
 
 ## 라이선스
 

@@ -25,8 +25,11 @@ struct ProjectScanner {
     }
 
     func scan() -> [String] {
-        let keys = catalogKeys()
-        var warnings: [String] = []
+        let catalogs = catalogURLs()
+        let keys = catalogKeys(in: catalogs)
+        var warnings = catalogs.flatMap {
+            CatalogScanner(requiredLanguages: settings.requiredLanguages).scan(file: $0)
+        }
 
         for file in projectFiles(extension: "swift") {
             warnings += scan(file: file, keys: keys)
@@ -70,19 +73,14 @@ struct ProjectScanner {
         }
     }
 
-    private func catalogKeys() -> Set<String> {
-        let catalogURLs: [URL]
-
+    private func catalogURLs() -> [URL] {
         if settings.catalogs.isEmpty {
-            catalogURLs = projectFiles(
-                extension: "xcstrings"
-            )
-        } else {
-            catalogURLs = settings.catalogs.map {
-                root.appendingPathComponent($0)
-            }
+            return projectFiles(extension: "xcstrings")
         }
+        return settings.catalogs.map { root.appendingPathComponent($0) }
+    }
 
+    private func catalogKeys(in catalogURLs: [URL]) -> Set<String> {
         return catalogURLs.reduce(into: Set<String>()) {
             keys,
             catalogURL in
