@@ -49,6 +49,7 @@ Text(verbatim: "HTTP")
 {
   "catalogs": ["Sources/Resources/Localizable.xcstrings"],
   "requiredLanguages": ["ko", "en", "ja"],
+  "sourceLanguages": ["ko"],
   "excludedPaths": ["Tests", "Generated", "PreviewContent", ".build"],
   "ignoredFunctions": ["print", "debugPrint", "fatalError", "os_log"]
 }
@@ -66,9 +67,9 @@ Xcode Target에 플러그인을 연결하면 입력 파일이 변경된 후 빌�
 
 ## 현재 제한 사항
 
-LocalizationGuard는 현재 한국어 원문을 사용하는 프로젝트를 중심으로 검사합니다.
+LocalizationGuard는 기본적으로 한국어 원문 문자열을 탐지합니다. 일본어 원문 프로젝트는 `sourceLanguages`를 `["ja"]`로 설정하고, 두 언어가 함께 있는 프로젝트는 둘 다 지정할 수 있습니다. 현재 지원하는 값은 `ko`, `ja`입니다.
 
-일반 문자열 탐지는 한글이 포함된 문자열을 대상으로 하며, 명시적으로 지원하는 SwiftUI API는 언어와 관계없이 검사될 수 있습니다.
+일반 문자열 탐지는 설정한 원문 언어의 문자를 포함한 문자열을 대상으로 하며, 명시적으로 지원하는 SwiftUI API는 언어와 관계없이 검사될 수 있습니다.
 
 키 존재 여부와 언어별 번역 누락·빈 값을 검사합니다. 번역의 품질, 검토 상태, 언어별 모든 복수형 범주의 존재 여부까지 판단하지는 않습니다. 카탈로그 전체에 없는 언어는 자동 추론할 수 없으므로 `requiredLanguages`로 지정해야 합니다.
 

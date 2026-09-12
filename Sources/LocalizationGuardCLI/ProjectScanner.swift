@@ -13,8 +13,10 @@ struct ProjectScanner {
         #"(?:String\s*\(\s*localized\s*:|LocalizedStringResource\s*\()\s*\"((?:\\.|[^\"\\])*)\""#
     private let anyStringLiteralPattern =
         #"\"((?:\\.|[^\"\\])*)\""#
-    private let koreanPattern =
-        #"[\u{AC00}-\u{D7A3}]"#
+    private let sourceLanguagePatterns = [
+        "ko": #"[\u{AC00}-\u{D7A3}]"#,
+        "ja": #"[\u{3040}-\u{30FF}\u{3400}-\u{4DBF}\u{4E00}-\u{9FFF}]"#
+    ]
 
     init(
         root: URL,
@@ -259,7 +261,7 @@ struct ProjectScanner {
         ) {
             let value = decoded(match.value)
 
-            guard containsKorean(value) else {
+            guard containsSourceLanguage(value) else {
                 continue
             }
 
@@ -335,13 +337,19 @@ struct ProjectScanner {
         )) ?? value
     }
 
-    private func containsKorean(
+    private func containsSourceLanguage(
         _ value: String
     ) -> Bool {
-        value.range(
-            of: koreanPattern,
-            options: .regularExpression
-        ) != nil
+        settings.sourceLanguages.contains { language in
+            guard let pattern = sourceLanguagePatterns[language] else {
+                return false
+            }
+
+            return value.range(
+                of: pattern,
+                options: .regularExpression
+            ) != nil
+        }
     }
 
     private func isIgnoredDiagnosticLine(

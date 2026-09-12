@@ -49,6 +49,7 @@ Add `.localizationguard.json` to the root of the project being scanned. If `cata
 {
   "catalogs": ["Sources/Resources/Localizable.xcstrings"],
   "requiredLanguages": ["ko", "en", "ja"],
+  "sourceLanguages": ["ko"],
   "excludedPaths": ["Tests", "Generated", "PreviewContent", ".build"],
   "ignoredFunctions": ["print", "debugPrint", "fatalError", "os_log"]
 }
@@ -66,9 +67,9 @@ When attached to an Xcode target, the plug-in runs automatically when its inputs
 
 ## Current limitations
 
-LocalizationGuard currently focuses on projects that use Korean source strings.
+LocalizationGuard detects Korean source strings by default. Set `sourceLanguages` to `["ja"]` for Japanese source strings, or specify both languages when a project contains both. Supported values are `ko` and `ja`.
 
-General string detection targets strings containing Korean characters. Explicitly supported SwiftUI APIs may be checked regardless of language.
+General string detection targets characters in the configured source languages. Explicitly supported SwiftUI APIs may be checked regardless of language.
 
 The scanner checks key presence and missing/empty per-language values. It does not judge translation quality, review status, or whether all language-specific plural categories are present. Inferred languages cannot detect a locale absent from the entire catalog; use `requiredLanguages` for that case.
 

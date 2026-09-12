@@ -49,6 +49,7 @@ Text(verbatim: "HTTP")
 {
   "catalogs": ["Sources/Resources/Localizable.xcstrings"],
   "requiredLanguages": ["ko", "en", "ja"],
+  "sourceLanguages": ["ko"],
   "excludedPaths": ["Tests", "Generated", "PreviewContent", ".build"],
   "ignoredFunctions": ["print", "debugPrint", "fatalError", "os_log"]
 }
@@ -66,9 +67,9 @@ Xcode ターゲットにプラグインを接続すると、入力ファイル�
 
 ## 現在の制限事項
 
-LocalizationGuard は現在、韓国語のソース文字列を使用するプロジェクトを中心に検査します。
+LocalizationGuard はデフォルトで韓国語のソース文字列を検出します。日本語のソース文字列を使用するプロジェクトでは `sourceLanguages` を `["ja"]` に設定し、両方の言語を含むプロジェクトでは両方を指定できます。現在サポートしている値は `ko` と `ja` です。
 
-一般的な文字列検出は韓国語文字を含む文字列を対象としています。明示的に対応する SwiftUI API は、言語に関係なく検査される場合があります。
+一般的な文字列検出は、設定したソース言語の文字を含む文字列を対象としています。明示的に対応する SwiftUI API は、言語に関係なく検査される場合があります。
 
 キーの存在と、言語ごとの翻訳漏れ・空の値を検査します。翻訳の品質、レビュー状態、言語ごとのすべての複数形カテゴリの存在までは判断しません。カタログ全体に存在しない言語は自動推測できないため、`requiredLanguages` で指定する必要があります。
 

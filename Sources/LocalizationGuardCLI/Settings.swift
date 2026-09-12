@@ -3,6 +3,7 @@ import Foundation
 struct Settings: Decodable {
     var catalogs: [String] = []
     var requiredLanguages: [String] = []
+    var sourceLanguages = ["ko"]
     var excludedPaths = [
         "Tests",
         "Generated",
@@ -21,6 +22,7 @@ struct Settings: Decodable {
     private enum CodingKeys: String, CodingKey {
         case catalogs
         case requiredLanguages
+        case sourceLanguages
         case excludedPaths
         case ignoredFunctions
     }
@@ -32,6 +34,7 @@ struct Settings: Decodable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         catalogs = try values.decodeIfPresent([String].self, forKey: .catalogs) ?? catalogs
         requiredLanguages = try values.decodeIfPresent([String].self, forKey: .requiredLanguages) ?? requiredLanguages
+        sourceLanguages = try values.decodeIfPresent([String].self, forKey: .sourceLanguages) ?? sourceLanguages
         excludedPaths = try values.decodeIfPresent([String].self, forKey: .excludedPaths) ?? excludedPaths
         ignoredFunctions = try values.decodeIfPresent([String].self, forKey: .ignoredFunctions) ?? ignoredFunctions
     }
