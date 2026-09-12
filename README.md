@@ -67,7 +67,15 @@ When attached to an Xcode target, the plug-in runs automatically when its inputs
 
 ## Current limitations
 
-LocalizationGuard detects Korean source strings by default. Set `sourceLanguages` to `["ja"]` for Japanese source strings, or specify both languages when a project contains both. Supported values are `ko` and `ja`.
+LocalizationGuard detects Korean source strings by default. To scan Japanese source strings, update `.localizationguard.json` with `sourceLanguages`. A project that contains both languages can specify both values. Supported values are `ko` and `ja`.
+
+```json
+{
+  "sourceLanguages": ["ja"]
+}
+```
+
+Use `["ko"]` for Korean source strings, or `["ko", "ja"]` when both languages are used.
 
 General string detection targets characters in the configured source languages. Explicitly supported SwiftUI APIs may be checked regardless of language.
 
