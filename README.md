@@ -71,7 +71,7 @@ LocalizationGuard detects Korean source strings by default. Set `sourceLanguages
 
 General string detection targets characters in the configured source languages. Explicitly supported SwiftUI APIs may be checked regardless of language.
 
-The scanner checks key presence and missing/empty per-language values. It does not judge translation quality, review status, or whether all language-specific plural categories are present. Inferred languages cannot detect a locale absent from the entire catalog; use `requiredLanguages` for that case.
+The scanner checks key presence and missing/empty per-language values. It does not judge translation quality, review status, or whether all language-specific plural categories are present. If a required language does not appear anywhere in a catalog yet, declare it with `requiredLanguages`.
 
 ## License
 
